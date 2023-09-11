@@ -4,4 +4,3 @@ Terraform_1.56/
 **/.terraform/*
 **/.terraform.lock.hcl
 My-Project.pem
-Terraform/
