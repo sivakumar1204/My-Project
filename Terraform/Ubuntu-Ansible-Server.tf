@@ -1,42 +1,45 @@
 /*
-resource "aws_instance" "Ubuntu-Ansible-Node" {
+resource "aws_instance" "Ubuntu-Ansible-Server" {
   ami             = var.ubuntu-ami-id           # Replace with the desired Ubuntu AMI ID
   instance_type   = var.instance-type            # Change to your preferred instance type
   #key_name        = aws_key_pair.My-Project-key.key_name        # Replace with your pem key file
   key_name        = var.key-name
-  subnet_id       = var.subnet-1A-id
+  subnet_id       = var.subnet-1B-id
   #subnet_id       = data.aws_subnet.My-Project-Public-Subnet-1A.id # Replace with your subnet id
   #security_group_id = [aws_security_group.My-Project-SG.id]  # Replace with your Security Group id 
   vpc_security_group_ids = [var.vpc_security_group_id]
   #vpc_security_group_ids = [aws_security_group.My-Project-SG.id] # Replace with your Security Group id 
   associate_public_ip_address = true
-  private_ip = var.ansible-node-private-ip
-  #public_ip = "10.0.1.10"
+  private_ip = var.ansible-server-private-ip
+  #public_ip = "10.0.2.15"
   user_data = <<-EOF
-              #!/bin/bash
-              export CURRENT_USER="ubuntu"
-              export NEW_USER="ansadmin"
-              export NEW_PASSWORD="test123"
-              useradd -m -s /bin/bash $NEW_USER
-              echo "$NEW_USER:$NEW_PASSWORD" | chpasswd
-              usermod -aG adm $CURRENT_USER
-              usermod -aG adm $NEW_USER
-              echo "$CURRENT_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-              sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-              service ssh restart
-              EOF
+                #!/bin/bash
+                export CURRENT_USER="ubuntu"
+                export NEW_USER="ansadmin"
+                export NEW_PASSWORD="test123"
+                export REMOTE_USERNAME="ansadmin"
+                export REMOTE_SERVER_IP_ADDRESS="10.0.1.10"
+                useradd -m -s /bin/bash $NEW_USER
+                echo "$NEW_USER:$NEW_PASSWORD" | chpasswd
+                usermod -aG adm $CURRENT_USER
+                usermod -aG adm $NEW_USER
+                echo "$CURRENT_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+                echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+                sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+                service ssh restart
+                EOF
   tags = {
-    Name = "Ubuntu-Ansible-Node"
+    Name = "Ubuntu-Ansible-Server"
     Owner = local.Owner
     Dept = local.Dept
     Env = local.Env
     }
 }
+  
 
 
 /*
-
+# If you want to create cusotm key and add the key into your ec2 instance then use the below resource section do the necessary changes
 resource "aws_key_pair" "My-Project-key" {
   key_name   = "My-Project-key"
   # teh best approch is to provide the path where the public key is stored in your local system

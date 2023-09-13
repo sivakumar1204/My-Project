@@ -10,20 +10,6 @@ terraform {
     region = "ca-central-1"
   }
 }
-/*
-# Create a VPC
-resource "aws_vpc" "My-Project" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
-  tags = {
-  Name = "My-Project"
-  Owner = "Siva"
-  Dept = "DevOps"
-}
-}
-*/
-
 # Create a VPC
 resource "aws_vpc" "My-Project-VPC" {
   cidr_block = "10.0.0.0/16"
@@ -98,39 +84,3 @@ resource "aws_route_table_association" "My-Project-Public-Subnet-1B_Association"
   subnet_id      = aws_subnet.My-Project-Public-Subnet-1B.id
   route_table_id = aws_route_table.My-Project-RT.id
 }
-
-# Create a security group allowing SSH and all traffic from anywhere
-resource "aws_security_group" "My-Project-SG" {
-  name        = "My-Project-SG"
-  description = "My-Project-SG"
-  vpc_id      = aws_vpc.My-Project-VPC.id
-  tags = {
-    Name = "My-Project-SG"
-    Owner = "Siva"
-    Dept = "DevOps"
-    } 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-/*
-
-resource "aws_vpc" "dpw-vpc" {
-          cidr_block = "10.1.0.0/16"
-          tags = {
-           Name = "dpw-vpc"
-        }
-      }
-
-*/

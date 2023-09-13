@@ -1,0 +1,81 @@
+Ansible Installation Steps on Ubuntu OS
+======================================
+
+Note: Remote-Server-Pre-Requisites:
+===============================
+1)Remote user has been created
+2)Added into sudoers file and adm group 
+3)Enabled password-based authentication set to yes
+
+1)Update the current user password
+
+sudo passwd  <current user>
+
+2)create user and password needs to be set
+
+sudo adduser <username>
+
+3)Add the user into sudoers file
+
+sudo visudo
+
+<current user> ALL=(ALL) NOPASSWD:ALL
+<new user> ALL=(ALL) NOPASSWD: ALL
+
+4)enable the password-based authentication is set to yes
+
+sudo vi /etc/ssh/sshd_config 
+
+****restart the sshd service*****
+
+sudo service sshd restart 
+
+*******check whether the service is restarted or not comparing the timestamp************
+
+sudo service sshd status
+
+5)Switch to created user:
+
+sudo su - <new user>
+
+6)Install Ansible and Check the version of ansible
+
+sudo apt-get update -y
+sudo apt install ansible -y
+ansible --version
+
+7)Create SSH Keys and copy the public key on to the remote server
+
+ssh-keygen
+			
+*********copy the public key on to the remote server**************
+
+ssh-copy-id remote-user@remote server private IP address
+
+8)Create host file the user home directory and provide ownership as well
+
+sudo cd ~
+
+sudo touch hosts.txt
+
+sudo chown -R <new user>:<new user> *
+
+sudo vi hosts
+
+*** ADD the remote server Private IP address under which group you want to add this server*******
+		
+9)Let’s try to check the connectivity from the ansible using ping module
+
+ansible all -i  ./hosts -u <remote-user> -m ping
+
+O/P:
+		/*
+		<your remote server IP Address> | SUCCESS => {
+		"ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+		},
+		"changed": false,
+		"ping": "pong"
+		}
+
+
