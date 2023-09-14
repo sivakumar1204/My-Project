@@ -24,6 +24,13 @@ resource "aws_security_group" "My-Project-SG" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+   # Outbound rule to allow all traffic
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 

@@ -1,18 +1,25 @@
 /*
+data "aws_subnet" "My-Project-Public-Subnet-1A" {
+  id = aws_subnet.My-Project-Public-Subnet-1A.id
+}
+*/
+
 resource "aws_instance" "Ubuntu-Ansible-Node" {
   ami             = var.ubuntu-ami-id           # Replace with the desired Ubuntu AMI ID
   instance_type   = var.instance-type            # Change to your preferred instance type
-  #key_name        = aws_key_pair.My-Project-key.key_name        # Replace with your pem key file
+  #key_name        = aws_key_pair.My-Project-key.key_name        # Replace with your created pem key file
   key_name        = var.key-name
   subnet_id       = var.subnet-1A-id
-  #subnet_id       = data.aws_subnet.My-Project-Public-Subnet-1A.id # Replace with your subnet id
+  #subnet_id       = data.aws_subnet.My-Project-Public-Subnet-1A.id # Refer from the data block
   #security_group_id = [aws_security_group.My-Project-SG.id]  # Replace with your Security Group id 
   vpc_security_group_ids = [var.vpc_security_group_id]
   #vpc_security_group_ids = [aws_security_group.My-Project-SG.id] # Replace with your Security Group id 
   associate_public_ip_address = true
   private_ip = var.ansible-node-private-ip
   #public_ip = "10.0.1.10"
-  user_data = <<-EOF
+  user_data = file("Ansible-Node.sh")
+  /*
+  #user_data = <<-EOF
               #!/bin/bash
               export CURRENT_USER="ubuntu"
               export NEW_USER="ansadmin"
@@ -25,18 +32,55 @@ resource "aws_instance" "Ubuntu-Ansible-Node" {
               echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
               sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
               service ssh restart
+
               EOF
+  */
   tags = {
     Name = "Ubuntu-Ansible-Node"
     Owner = local.Owner
     Dept = local.Dept
     Env = local.Env
     }
+    #Store the public ip and instance ip into  the file respective files
+    provisioner "local-exec" {
+    command = "echo ${aws_instance.Ubuntu-Ansible-Node.public_ip} > Ubuntu-Ansible-Node-Public-IP.txt"
+    }
+    provisioner "local-exec" {
+    command = "echo ${aws_instance.Ubuntu-Ansible-Node.id} > Ubuntu-Ansible-Node-Instance.id.txt"
+    }
+
+    /*
+    provisioner "remote-exec" {
+      inline = [ 
+        "sudo apt-get update -y",
+        "sudo apt install ansible -y"
+       ]
+      connection {
+        type        = "ssh"
+        user        = "ubuntu"
+        private_key = file("My-Project.pem")  //Copied pem key file  manually and stored in the terrsfom working directory
+        #private_key = file("Provide the full path where is your pem file")
+        host    = self.public_ip
+        timeout = "30m"
+      } 
+    }
+    */
 }
 
+#Display the Public IP
+output "Ubuntu-Ansible-Node-Public-IP" {
+  value = aws_instance.Ubuntu-Ansible-Node.public_ip
+  
+}
+
+#Display the INstance ID
+output "Ubuntu-Ansible-Node-id" {
+  value = aws_instance.Ubuntu-Ansible-Node.id
+  
+}
 
 /*
-
+# If you want to create cusotm key and add the key into your ec2 instance then use the below resource section do the necessary changes
 resource "aws_key_pair" "My-Project-key" {
   key_name   = "My-Project-key"
   # teh best approch is to provide the path where the public key is stored in your local system

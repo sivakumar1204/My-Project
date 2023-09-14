@@ -40,7 +40,7 @@ variable "key-name" {
   
 }
 variable "ubuntu-ami-id" {
-    default = "ami-09f313b0430d08493" # Custom AMI Created manuallly
+    default = "ami-0ea18256de20ecdfc" # Ubuntu Server 22.04
 }
 
 variable "instance-type" {
