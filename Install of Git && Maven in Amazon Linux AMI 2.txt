@@ -50,3 +50,17 @@ cd myweb/
 
 # Build the Maven project
 sudo mvn clean install
+
+====================================================
+Deploy on to the Apache Tomcat Server
+====================================================
+1)First download the Software form site (tar.gz)
+2)Extract the file
+3)Move the created build file (.war) file into tomcat webapps directory.
+4)Create users in tomcat.xml {{conf/tomcat-users.xml}}
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<user username="tomcat" password="tomcat" roles="manager-gui,manager-script"/>
+5)Remove the loopbackip address (value field and address field from the file ) {{/webapps/manager/META-INF/context.xml}}
+6)Run the stop and start scripts for restarting the tomcat service.
+7)check in hte UI whether its accessing or not.
