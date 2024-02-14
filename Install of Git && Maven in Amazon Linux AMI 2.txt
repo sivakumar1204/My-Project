@@ -1,0 +1,52 @@
+============================================================================
+Install of Git && Maven in Amazon Linux AMI 2
+============================================================================
+
+#!/bin/bash
+
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/'
+/etc/ssh/sshd_config
+sed -i 's/ssh_pwauth: false/ssh_pwauth: true/' /etc/cloud/cloud.cfg
+sed -i 's/lock_passwd: true/lock_passwd: false/' /etc/cloud/cloud.cfg
+systemctl restart sshd.service
+sudo useradd test
+sudo useradd ec2-user
+sudo chpasswd <<<"test:test123"
+sudo chpasswd <<<"ec2-user:test123"
+usermod -aG sudo test
+usermod -aG sudo ec2-user
+
+# Update the system
+sudo yum update -y
+
+# Install Git, Maven, Java 11, and Java 8 development package
+sudo yum install git -y
+sudo yum install maven -y
+sudo amazon-linux-extras install java-openjdk11 -y
+sudo yum install -y java-1.8.0-openjdk-devel -y
+
+# Verify Git, Maven, and Java installations
+sudo git --version
+sudo mvn --version
+java -version
+
+# Set Java 11 as the default version
+sudo alternatives --config java <<< "2"
+
+# Verify Java 11 installation
+java -version
+
+# Set Java 8 as the default version for javac
+sudo alternatives --config javac <<< "2"
+
+# Verify Java 8 javac installation
+javac -version
+
+# Clone the Git repository
+git clone https://github.com/sivakumar1204/myweb.git
+
+# Change into the cloned directory
+cd myweb/
+
+# Build the Maven project
+sudo mvn clean install
